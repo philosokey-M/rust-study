@@ -2,32 +2,44 @@ use std::io;
 use std::cmp::Ordering;
 use rand::Rng;
 
-fn main() {
+fn main() { // https://doc.rust-kr.org/ch02-00-guessing-game-tutorial.html
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1..=100); // 범위 표현식: start..=end -> start부터 end까지 범위 | ex) 1..=100 -> 1부터 100까지 범위
     
     println!("The secret number is: {secret_number}");
 
-    println!("Please input your guess.");
+    
+    loop {
+        println!("Please input your guess.");
+    
+        let mut guess = String::new(); // rust는 기본적으로 변수가 불변 -> 가변으로 쓰고 싶으면, mut 키워드 사용
 
-    let mut guess = String::new(); // rust는 기본적으로 변수가 불변 -> 가변으로 쓰고 싶으면, mut 키워드 사용
+        io::stdin()
+            .read_line(&mut guess) // read_line() : 사용자 입력을 읽어오는 함수 -> 입력값 저장 및 Result 타입의 값(Ok | Err) 반환
+            .expect("Failed to read line"); // read_line() 함수 호출 결과 Err 인 경우 처리 -> expect() : 에러 메시지 출력 및 프로그램 종료
 
-    io::stdin()
-        .read_line(&mut guess) // read_line() : 사용자 입력을 읽어오는 함수 -> 입력값 저장 및 Result 타입의 값(Ok | Err) 반환
-        .expect("Failed to read line"); // read_line() 함수 호출 결과 Err 인 경우 처리 -> expect() : 에러 메시지 출력 및 프로그램 종료
+        let guess: u32 = match guess.trim()
+                        .parse() {
+                            Ok(num) => num,
+                            Err(_) => continue,
+                        };
+                        // .expect("Please type a number!");
 
-    let guess: u32 = guess.trim()
-                    .parse()
-                    .expect("Please type a number!");
+        println!("You guessed: {guess}");
 
-    println!("You guessed: {guess}");
+        println!("Please input your guess.");
 
-    match guess.cmp(&secret_number) {
-        Ordering::Less => println!("Too small!"),
-        Ordering::Greater => println!("Too big!"),
-        Ordering::Equal => println!("You win!"),
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("Too small!"),
+            Ordering::Greater => println!("Too big!"),
+            Ordering::Equal => {
+                println!("You win!");
+                break;
+            }
+        }
     }
+
 
 }
 /* <:: 표시>
